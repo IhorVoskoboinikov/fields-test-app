@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Оточення
+.env
+
+# IDE та локальні налаштування
+.idea/
+.vscode/
+.claude/
+
+# Робочі документи (не входять у здачу)
+design.md
+fields_test_task.txt
+*.pdf
