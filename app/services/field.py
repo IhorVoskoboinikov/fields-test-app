@@ -1,5 +1,6 @@
 """Бізнес-логіка полів: валідація геометрії й площі, межі транзакцій."""
 
+import time
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,7 +18,11 @@ from app.schemas.field import (
     FieldListItem,
     FieldListQuery,
     FieldListResponse,
+    FieldMatch,
     FieldRead,
+    FindByPointResponse,
+    PointOut,
+    PointQuery,
 )
 
 logger = get_logger(__name__)
@@ -67,4 +72,22 @@ class FieldService:
             total, rows = await self.repo.list_page(filters, limit=query.limit, offset=query.offset)
         return FieldListResponse(
             total=total, fields=[FieldListItem.model_validate(row) for row in rows]
+        )
+
+    async def find_by_point(self, query: PointQuery) -> FindByPointResponse:
+        """Поля, що містять точку (може бути кілька, якщо поля перекриваються).
+
+        `query_time_ms` — час лише SQL-запиту пошуку: з'єднання з пулу і BEGIN
+        беремо до початку заміру. Немає збігів → порожній список, а не 404.
+        """
+        async with self.session.begin():
+            await self.session.connection()
+            started = time.perf_counter()
+            rows = await self.repo.find_by_point(query.lon, query.lat)
+            query_time_ms = (time.perf_counter() - started) * 1000
+        logger.info("find_by_point matches=%d query_time_ms=%.2f", len(rows), query_time_ms)
+        return FindByPointResponse(
+            query_point=PointOut(lon=query.lon, lat=query.lat),
+            fields=[FieldMatch.model_validate(row) for row in rows],
+            query_time_ms=query_time_ms,
         )

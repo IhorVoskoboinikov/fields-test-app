@@ -98,6 +98,37 @@ class FieldListQuery(BaseModel):
         return self
 
 
+class FieldMatch(FieldListItem):
+    """Поле, що містить точку, з відстанню від точки до центроїда поля."""
+
+    distance_to_center_m: float
+
+    @field_serializer("distance_to_center_m")
+    def round_distance(self, value: float) -> float:
+        """Відстань у метрах з точністю до 0.1 м."""
+        return round(value, 1)
+
+
+class PointOut(BaseModel):
+    """Точка запиту у відповіді пошуку."""
+
+    lon: float
+    lat: float
+
+
+class FindByPointResponse(BaseModel):
+    """Відповідь GET /api/fields/find-by-point рівно як у ТЗ."""
+
+    query_point: PointOut
+    fields: list[FieldMatch]
+    query_time_ms: float
+
+    @field_serializer("query_time_ms")
+    def round_query_time(self, value: float) -> float:
+        """Час SQL-запиту пошуку в мілісекундах з точністю до 0.01 мс."""
+        return round(value, 2)
+
+
 class PointQuery(BaseModel):
     """Query-параметри пошуку за точкою: обидва обов'язкові."""
 

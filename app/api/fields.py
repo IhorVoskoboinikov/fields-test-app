@@ -6,7 +6,14 @@ from uuid import UUID
 from fastapi import APIRouter, Query, status
 
 from app.dependencies.services import FieldServiceDep
-from app.schemas.field import FieldCreate, FieldListQuery, FieldListResponse, FieldRead
+from app.schemas.field import (
+    FieldCreate,
+    FieldListQuery,
+    FieldListResponse,
+    FieldRead,
+    FindByPointResponse,
+    PointQuery,
+)
 
 router = APIRouter(prefix="/api/fields", tags=["fields"])
 
@@ -25,8 +32,14 @@ async def list_fields(
     return await service.list_fields(query)
 
 
-# Важливо: /find-by-point (етап 5) оголошується ВИЩЕ за /{field_id},
+# Важливо: /find-by-point оголошується ВИЩЕ за /{field_id},
 # інакше "find-by-point" розпарситься як UUID і поверне 422.
+@router.get("/find-by-point", response_model=FindByPointResponse)
+async def find_fields_by_point(
+    query: Annotated[PointQuery, Query()], service: FieldServiceDep
+) -> FindByPointResponse:
+    """Пошук полів, що містять задану точку."""
+    return await service.find_by_point(query)
 
 
 @router.get("/{field_id}", response_model=FieldRead)

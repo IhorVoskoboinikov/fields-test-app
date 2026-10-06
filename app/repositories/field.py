@@ -10,6 +10,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Field
 
+# Каст у geography для метрів на еліпсоїді (`::geography`); SRID явно, інакше
+# GeoAlchemy2 рендерить geography(GEOMETRY,-1) і PostGIS пише NOTICE
+GEOGRAPHY = Geography(srid=4326)
+
 # Геометрія у відповідях: GeoJSON прямо з PostGIS (`ST_AsGeoJSON(geom)::json`)
 GEOMETRY_JSON = cast(func.ST_AsGeoJSON(Field.geom), JSON).label("geometry")
 
@@ -58,7 +62,7 @@ class FieldRepository:
         stmt = select(
             func.ST_IsValid(geom).label("is_valid"),
             func.ST_IsValidReason(geom).label("reason"),
-            case((func.ST_IsValid(geom), func.ST_Area(cast(geom, Geography)) / 10000)).label(
+            case((func.ST_IsValid(geom), func.ST_Area(cast(geom, GEOGRAPHY)) / 10000)).label(
                 "area_ha"
             ),
         )
@@ -106,6 +110,34 @@ class FieldRepository:
         )
         rows = (await self.session.execute(page_stmt)).mappings().all()
         return total, [dict(row) for row in rows]
+
+    async def find_by_point(self, lon: float, lat: float) -> list[dict[str, Any]]:
+        """Поля, що містять точку, від найближчого центру до найдальшого.
+
+        SELECT id, name, area_ha, crop, owner,
+               ST_Distance(ST_Centroid(geom)::geography, point::geography) AS distance_to_center_m
+        FROM fields
+        WHERE ST_Intersects(geom, point)
+        ORDER BY distance_to_center_m
+
+        `ST_Intersects` неявно додає індексну умову `geom && point`: GIST-індекс швидко
+        відбирає поля, чий обмежувальний прямокутник містить точку, і точна перевірка
+        йде лише для них. Колонка `geom` у WHERE «гола» — усі перетворення лише над
+        точкою, інакше індекс не спрацює. Точка на межі поля вважається всередині
+        (на відміну від `ST_Contains`). Центроїд і відстань (у метрах, на еліпсоїді)
+        рахуються лише для знайдених рядків.
+        """
+        point = func.ST_SetSRID(func.ST_MakePoint(lon, lat), 4326)
+        distance = func.ST_Distance(
+            cast(func.ST_Centroid(Field.geom), GEOGRAPHY), cast(point, GEOGRAPHY)
+        ).label("distance_to_center_m")
+        stmt = (
+            select(*LIST_COLUMNS, distance)
+            .where(func.ST_Intersects(Field.geom, point))
+            .order_by(distance)
+        )
+        rows = (await self.session.execute(stmt)).mappings().all()
+        return [dict(row) for row in rows]
 
     @staticmethod
     def _apply_filters(stmt: Select, filters: FieldFilters) -> Select:
