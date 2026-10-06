@@ -1,22 +1,27 @@
 # Усі значення задані тут, секретів немає — compose стартує без .env.
-# Потрібен Docker Compose v2 (`docker compose`): умову
-# service_completed_successfully старий docker-compose не розуміє.
+# Потрібен Docker Compose v2+ (`docker compose`).
+# Значення беруться з .env (шаблон — .env.example); без .env діють значення
+# за замовчуванням після ":-", тож проєкт стартує однією командою.
 name: fields-api
 
+x-db-credentials: &db-credentials
+  POSTGRES_USER: ${POSTGRES_USER:-fields}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fields}
+  POSTGRES_DB: ${POSTGRES_DB:-fields}
+
 x-app-env: &app-env
-  # Усередині compose база доступна за стандартною адресою db:5432
-  DATABASE_URL: postgresql+asyncpg://fields:fields@db:5432/fields
-  LOG_LEVEL: INFO
+  <<: *db-credentials
+  # Усередині мережі compose база доступна як db:5432 (незалежно від .env)
+  POSTGRES_HOST: db
+  POSTGRES_PORT: "5432"
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
 
 services:
   db:
     image: postgis/postgis:16-3.4
-    environment:
-      POSTGRES_USER: fields
-      POSTGRES_PASSWORD: fields
-      POSTGRES_DB: fields
+    environment: *db-credentials
     ports:
-      - "5433:5432"  # 5433 на хості — не конфліктує з локальним Postgres
+      - "${POSTGRES_PORT:-5433}:5432"  # 5433 на хості — не конфліктує з локальним Postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
