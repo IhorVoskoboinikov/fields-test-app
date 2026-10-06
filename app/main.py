@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api import health
+from app.api import fields, health
 from app.core.error_handlers import register_error_handlers
 from app.core.logger import get_logger, setup_logging
 from app.core.settings import get_settings
@@ -39,6 +39,7 @@ def create_app() -> FastAPI:
     setup_logging(get_settings().log_level)
 
     app = FastAPI(title="Fields API", version="0.1.0", lifespan=lifespan)
+    app.include_router(fields.router)
     app.include_router(health.router)
     register_error_handlers(app)
     # Доданий останнім — найзовнішній серед користувацьких middleware
