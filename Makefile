@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format test up down reset logs db migrate revision reseed seed-large
+.PHONY: help install lint format test up down reset logs db migrate revision reseed seed-large bench
 
 help:  ## Список команд
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-12s %s\n", $$1, $$2}'
@@ -42,3 +42,6 @@ reseed:  ## Перестворити сиди (2000 полів)
 
 seed-large:  ## 100 000 полів для демо продуктивності
 	docker compose run --rm seed python -m scripts.seed --truncate --count 100000
+
+bench:  ## Бенчмарк пошуку за точкою (p50/p95, з індексом і без)
+	uv run python -m scripts.benchmark
