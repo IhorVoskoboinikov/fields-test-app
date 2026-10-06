@@ -1,0 +1,15 @@
+.venv
+.git
+.gitignore
+.idea
+.vscode
+.claude
+.env
+**/__pycache__
+.pytest_cache
+.ruff_cache
+tests
+# робочі документи
+design.md
+fields_test_task.txt
+*.pdf

@@ -1,5 +1,12 @@
 # Усі значення задані тут, секретів немає — compose стартує без .env.
+# Потрібен Docker Compose v2 (`docker compose`): умову
+# service_completed_successfully старий docker-compose не розуміє.
 name: fields-api
+
+x-app-env: &app-env
+  # Усередині compose база доступна за стандартною адресою db:5432
+  DATABASE_URL: postgresql+asyncpg://fields:fields@db:5432/fields
+  LOG_LEVEL: INFO
 
 services:
   db:
@@ -19,6 +26,41 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+      start_period: 10s
+
+  migrate:
+    build: .
+    environment: *app-env
+    command: sh -c "python -m scripts.wait_for_db && alembic upgrade head"
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  seed:
+    build: .
+    environment: *app-env
+    # Нічого не робить, якщо таблиця не порожня
+    command: python -m scripts.seed
+    restart: "no"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  api:
+    build: .
+    environment: *app-env
+    ports:
+      - "8000:8000"
+    depends_on:
+      # Міграція впала → api не стартує (fail fast)
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
       start_period: 10s
 
   pgadmin:

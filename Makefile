@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format test up down reset logs db migrate revision
+.PHONY: help install lint format test up down reset logs db migrate revision reseed seed-large
 
 help:  ## Список команд
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-12s %s\n", $$1, $$2}'
@@ -36,3 +36,9 @@ migrate:  ## Застосувати міграції локально
 
 revision:  ## Згенерувати міграцію: make revision m="опис"
 	uv run alembic revision --autogenerate -m "$(m)"
+
+reseed:  ## Перестворити сиди (2000 полів)
+	docker compose run --rm seed python -m scripts.seed --truncate
+
+seed-large:  ## 100 000 полів для демо продуктивності
+	docker compose run --rm seed python -m scripts.seed --truncate --count 100000
