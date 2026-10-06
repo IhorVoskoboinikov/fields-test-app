@@ -120,8 +120,7 @@ DOMAIN_ERROR_EXAMPLES = domain_error_examples(
     DatabaseUnavailableError(),
 )
 
-# 422 у кожного ендпоінта свій: `details` рівно такі, як повертає застосунок
-# (відповідність перевіряє tests/integration/api/test_openapi_examples.py).
+# 422 у кожного ендпоінта свій: `details` рівно такі, як повертає застосунок.
 VALIDATION_ERROR_DETAILS: dict[str, list[dict[str, Any]]] = {
     # POST /api/fields з прикладом «Незамкнене кільце»
     "create_field": [
