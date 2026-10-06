@@ -1,0 +1,3 @@
+Міграції Alembic (async-шаблон). URL бази — з app.core.settings.
+
+Нова міграція: make revision m="опис" → переглянути файл руками → закомітити.

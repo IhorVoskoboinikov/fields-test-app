@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format test up down reset logs db
+.PHONY: help install lint format test up down reset logs db migrate revision
 
 help:  ## Список команд
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-12s %s\n", $$1, $$2}'
@@ -30,3 +30,9 @@ logs:  ## Логи API
 
 db:  ## Підняти лише базу (і pgAdmin) для локальної розробки
 	docker compose up -d db pgadmin
+
+migrate:  ## Застосувати міграції локально
+	uv run alembic upgrade head
+
+revision:  ## Згенерувати міграцію: make revision m="опис"
+	uv run alembic revision --autogenerate -m "$(m)"
