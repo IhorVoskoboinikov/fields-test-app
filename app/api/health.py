@@ -6,7 +6,8 @@ from app.core.exceptions import DatabaseUnavailableError
 from app.core.logger import get_logger
 from app.db.session import ping_database
 from app.dependencies.db import SessionDep
-from app.schemas.common import ErrorResponse, HealthResponse
+from app.openapi.responses import error_responses
+from app.schemas.common import HealthResponse
 
 router = APIRouter(tags=["service"])
 logger = get_logger(__name__)
@@ -17,7 +18,7 @@ logger = get_logger(__name__)
     response_model=HealthResponse,
     summary="Перевірка стану",
     description="200 — застосунок працює і PostgreSQL відповідає; 503 — база недоступна.",
-    responses={503: {"model": ErrorResponse, "description": "База недоступна"}},
+    responses=error_responses(503),
 )
 async def health(session: SessionDep) -> HealthResponse:
     """Виконує `SELECT 1`; будь-яка помилка з'єднання → 503."""

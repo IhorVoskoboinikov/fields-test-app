@@ -132,5 +132,5 @@ class FindByPointResponse(BaseModel):
 class PointQuery(BaseModel):
     """Query-параметри пошуку за точкою: обидва обов'язкові."""
 
-    lon: Longitude = Field(description="Довгота, −180…180")
-    lat: Latitude = Field(description="Широта, −90…90")
+    lon: Longitude = Field(description="Довгота, −180…180", examples=[30.5250])
+    lat: Latitude = Field(description="Широта, −90…90", examples=[50.4550])
