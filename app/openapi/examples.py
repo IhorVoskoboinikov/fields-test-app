@@ -1,4 +1,7 @@
-"""Приклади тіл запитів і відповідей для Swagger. Усі сценарії демо — прямо з /docs."""
+"""Приклади для Swagger: сценарії тіла POST і тіла помилок.
+
+Приклади успішних відповідей описані в самих Pydantic-схемах (`Field(examples=...)`).
+"""
 
 from typing import Any
 
@@ -76,43 +79,6 @@ FIELD_CREATE_EXAMPLES: dict[str, Example] = {
             "geometry": {"type": "Polygon", "coordinates": [TZ_POLYGON["coordinates"][0][:-1]]},
         },
     ),
-}
-
-FIELD_READ_EXAMPLE: dict[str, Any] = {
-    "id": FIELD_ID,
-    **{key: TZ_FIELD[key] for key in ("name", "geometry")},
-    "area_ha": 79.0,
-    "crop": "Пшениця",
-    "owner": "Іванов І.І.",
-    "created_at": "2026-10-06T07:04:06Z",
-}
-
-FIELD_LIST_EXAMPLE: dict[str, Any] = {
-    "total": 2001,
-    "fields": [
-        {
-            "id": FIELD_ID,
-            "name": "Поле №1 - Пшениця",
-            "area_ha": 79.0,
-            "crop": "Пшениця",
-            "owner": "Іванов І.І.",
-        }
-    ],
-}
-
-FIND_BY_POINT_EXAMPLE: dict[str, Any] = {
-    "query_point": {"lon": 30.525, "lat": 50.455},
-    "fields": [
-        {
-            "id": FIELD_ID,
-            "name": "Поле №1 - Пшениця",
-            "area_ha": 79.0,
-            "crop": "Пшениця",
-            "owner": "Іванов І.І.",
-            "distance_to_center_m": 241.7,
-        }
-    ],
-    "query_time_ms": 1.35,
 }
 
 

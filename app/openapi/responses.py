@@ -26,8 +26,3 @@ def error_responses(*status_codes: int) -> dict[int | str, dict[str, Any]]:
         }
         for code in status_codes
     }
-
-
-def success_example(example: dict[str, Any]) -> dict[str, Any]:
-    """Приклад успішної відповіді (модель береться з `response_model` роуту)."""
-    return {"content": {"application/json": {"example": example}}}

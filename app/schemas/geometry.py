@@ -30,7 +30,20 @@ class PolygonGeometry(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     type: Literal["Polygon"]
-    coordinates: list[list[Position]] = Field(min_length=1)
+    coordinates: list[list[Position]] = Field(
+        min_length=1,
+        examples=[
+            [
+                [
+                    [30.5234, 50.4501],
+                    [30.5334, 50.4501],
+                    [30.5334, 50.4601],
+                    [30.5234, 50.4601],
+                    [30.5234, 50.4501],
+                ]
+            ]
+        ],
+    )
 
     @field_validator("coordinates")
     @classmethod

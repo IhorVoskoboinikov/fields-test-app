@@ -46,11 +46,11 @@ class FieldCreate(BaseModel):
 class FieldListItem(BaseModel):
     """Поле в списку — без геометрії (менше даних із БД і по мережі)."""
 
-    id: UUID
-    name: str
-    area_ha: float
-    crop: str
-    owner: str
+    id: UUID = Field(examples=["8c7ff87a-cabd-48fa-bf7c-b47f94edc665"])
+    name: str = Field(examples=["Поле №1 - Пшениця"])
+    area_ha: float = Field(description="Площа, га", examples=[79.0])
+    crop: str = Field(examples=["Пшениця"])
+    owner: str = Field(examples=["Іванов І.І."])
 
     @field_serializer("area_ha")
     def round_area(self, value: float) -> float:
@@ -62,13 +62,13 @@ class FieldRead(FieldListItem):
     """Поле з повною геометрією: відповідь GET /api/fields/{id} і POST /api/fields."""
 
     geometry: PolygonGeometry
-    created_at: datetime
+    created_at: datetime = Field(examples=["2026-10-06T07:04:06Z"])
 
 
 class FieldListResponse(BaseModel):
     """Відповідь GET /api/fields рівно як у ТЗ: `{total, fields}`."""
 
-    total: int
+    total: int = Field(description="Кількість полів з урахуванням фільтрів", examples=[2001])
     fields: list[FieldListItem]
 
 
@@ -101,7 +101,9 @@ class FieldListQuery(BaseModel):
 class FieldMatch(FieldListItem):
     """Поле, що містить точку, з відстанню від точки до центроїда поля."""
 
-    distance_to_center_m: float
+    distance_to_center_m: float = Field(
+        description="Відстань від точки до центроїда поля, м", examples=[241.7]
+    )
 
     @field_serializer("distance_to_center_m")
     def round_distance(self, value: float) -> float:
@@ -112,8 +114,8 @@ class FieldMatch(FieldListItem):
 class PointOut(BaseModel):
     """Точка запиту у відповіді пошуку."""
 
-    lon: float
-    lat: float
+    lon: float = Field(examples=[30.525])
+    lat: float = Field(examples=[50.455])
 
 
 class FindByPointResponse(BaseModel):
@@ -121,7 +123,7 @@ class FindByPointResponse(BaseModel):
 
     query_point: PointOut
     fields: list[FieldMatch]
-    query_time_ms: float
+    query_time_ms: float = Field(description="Час SQL-запиту пошуку, мс", examples=[1.35])
 
     @field_serializer("query_time_ms")
     def round_query_time(self, value: float) -> float:
