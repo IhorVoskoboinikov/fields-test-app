@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install lint format test
+.PHONY: help install lint format test up down reset logs db
 
 help:  ## Список команд
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-12s %s\n", $$1, $$2}'
@@ -15,3 +15,18 @@ format:  ## Відформатувати код (ruff)
 
 test:  ## Запустити тести (потрібен Docker)
 	uv run pytest
+
+up:  ## Підняти всі сервіси
+	docker compose up -d --build
+
+down:  ## Зупинити сервіси
+	docker compose down
+
+reset:  ## Зупинити сервіси й видалити дані БД
+	docker compose down -v
+
+logs:  ## Логи API
+	docker compose logs -f api
+
+db:  ## Підняти лише базу (і pgAdmin) для локальної розробки
+	docker compose up -d db pgadmin

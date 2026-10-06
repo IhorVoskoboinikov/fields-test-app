@@ -1,0 +1,42 @@
+# Усі значення задані тут, секретів немає — compose стартує без .env.
+name: fields-api
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: fields
+      POSTGRES_PASSWORD: fields
+      POSTGRES_DB: fields
+    ports:
+      - "5433:5432"  # 5433 на хості — не конфліктує з локальним Postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # -h 127.0.0.1: перевірка по TCP не дає хибного «ready», поки образ
+      # виконує init-скрипти на тимчасовому сервері (він слухає лише unix-сокет)
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  pgadmin:
+    image: dpage/pgadmin4:9.18
+    environment:
+      # Desktop-режим: pgAdmin відкривається без логіна
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      # Обов'язкові для старту контейнера навіть у desktop-режимі
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    volumes:
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
