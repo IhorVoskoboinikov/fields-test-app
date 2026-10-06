@@ -30,7 +30,7 @@ router = APIRouter(prefix="/api/fields", tags=["fields"])
         "(перевіряє `ST_IsValid` у PostGIS, інакше 400), площа більша за 0.1 га (інакше 400). "
         "Площу рахує база на еліпсоїді Землі."
     ),
-    responses=error_responses(400, 422),
+    responses=error_responses(400, 422, operation="create_field"),
 )
 async def create_field(
     body: Annotated[FieldCreate, Body(openapi_examples=FIELD_CREATE_EXAMPLES)],
@@ -48,7 +48,7 @@ async def create_field(
         "Фільтри `crop` і `owner` — точний збіг; `min_area` і `max_area` — у гектарах, "
         "включно. Нові поля зверху. Геометрія в списку не повертається."
     ),
-    responses=error_responses(422),
+    responses=error_responses(422, operation="list_fields"),
 )
 async def list_fields(
     query: Annotated[FieldListQuery, Query()], service: FieldServiceDep
@@ -69,7 +69,7 @@ async def list_fields(
         "центроїда поля. Без збігів — 200 з порожнім `fields`. "
         "`query_time_ms` — час SQL-запиту пошуку (через GIST-індекс)."
     ),
-    responses=error_responses(422),
+    responses=error_responses(422, operation="find_fields_by_point"),
 )
 async def find_fields_by_point(
     query: Annotated[PointQuery, Query()], service: FieldServiceDep
@@ -83,7 +83,7 @@ async def find_fields_by_point(
     response_model=FieldRead,
     summary="Деталі поля",
     description="Поле з повною геометрією (GeoJSON Polygon).",
-    responses=error_responses(404, 422),
+    responses=error_responses(404, 422, operation="get_field"),
 )
 async def get_field(field_id: UUID, service: FieldServiceDep) -> FieldRead:
     """Деталі поля з повною геометрією."""

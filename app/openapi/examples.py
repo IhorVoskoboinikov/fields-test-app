@@ -4,8 +4,17 @@
 """
 
 from typing import Any
+from uuid import UUID
 
 from fastapi.openapi.models import Example
+
+from app.core.exceptions import (
+    AppError,
+    DatabaseUnavailableError,
+    FieldAreaTooSmallError,
+    FieldNotFoundError,
+    InvalidGeometryError,
+)
 
 REQUEST_ID = "3f2a9c1e-7d4b-4c1a-9a0e-2b5f6c7d8e9f"
 FIELD_ID = "8c7ff87a-cabd-48fa-bf7c-b47f94edc665"
@@ -82,58 +91,71 @@ FIELD_CREATE_EXAMPLES: dict[str, Example] = {
 }
 
 
-def error_example(code: str, message: str, details: Any = None) -> dict[str, Any]:
-    """Тіло помилки в єдиному форматі для прикладів."""
-    return {
-        "error": {"code": code, "message": message, "details": details, "request_id": REQUEST_ID}
-    }
+def error_body(code: str, message: str, details: Any = None) -> dict[str, Any]:
+    """Тіло помилки в єдиному форматі (як у `error_response`: без `details`, якщо їх немає)."""
+    error: dict[str, Any] = {"code": code, "message": message}
+    if details is not None:
+        error["details"] = details
+    error["request_id"] = REQUEST_ID
+    return {"error": error}
 
 
-ERROR_EXAMPLES: dict[int, dict[str, Example]] = {
-    400: {
-        "INVALID_GEOMETRY": Example(
-            summary="Полігон невалідний",
-            value=error_example(
-                "INVALID_GEOMETRY",
-                "Polygon is not valid",
-                {"reason": "Self-intersection[30.51 50.41]"},
+def domain_error_examples(*errors: AppError) -> dict[int, dict[str, Example]]:
+    """Приклади з самих винятків (статус → {code: приклад}): code, message і details
+    беруться з класів помилок, тож документація не розійдеться з кодом."""
+    examples: dict[int, dict[str, Example]] = {}
+    for error in errors:
+        examples.setdefault(error.status_code, {})[error.code] = Example(
+            summary=error.message, value=error_body(error.code, error.message, error.details)
+        )
+    return examples
+
+
+# details — як у реальних відповідях на приклади тіла POST вище («метелик»,
+# «менше 0.1 га») і на запит невідомого id
+DOMAIN_ERROR_EXAMPLES = domain_error_examples(
+    InvalidGeometryError("Self-intersection[30.51 50.41]"),
+    FieldAreaTooSmallError(0.0079),
+    FieldNotFoundError(UUID(FIELD_ID)),
+    DatabaseUnavailableError(),
+)
+
+# 422 у кожного ендпоінта свій: `details` рівно такі, як повертає застосунок
+# (відповідність перевіряє tests/integration/api/test_openapi_examples.py).
+VALIDATION_ERROR_DETAILS: dict[str, list[dict[str, Any]]] = {
+    # POST /api/fields з прикладом «Незамкнене кільце»
+    "create_field": [
+        {
+            "loc": ["body", "geometry", "coordinates"],
+            "msg": "Value error, ring 0 is not closed: first and last positions must be equal",
+            "type": "value_error",
+        }
+    ],
+    # GET /api/fields?crop=
+    "list_fields": [
+        {
+            "loc": ["query", "crop"],
+            "msg": "String should have at least 1 character",
+            "type": "string_too_short",
+        }
+    ],
+    # GET /api/fields/find-by-point?lon=30.5&lat=100
+    "find_fields_by_point": [
+        {
+            "loc": ["query", "lat"],
+            "msg": "Input should be less than or equal to 90",
+            "type": "less_than_equal",
+        }
+    ],
+    # GET /api/fields/abc
+    "get_field": [
+        {
+            "loc": ["path", "field_id"],
+            "msg": (
+                "Input should be a valid UUID, invalid length: "
+                "expected length 32 for simple format, found 3"
             ),
-        ),
-        "FIELD_AREA_TOO_SMALL": Example(
-            summary="Площа ≤ 0.1 га",
-            value=error_example(
-                "FIELD_AREA_TOO_SMALL",
-                "Field area must be greater than 0.1 ha",
-                {"area_ha": 0.0079, "min_area_ha": 0.1},
-            ),
-        ),
-    },
-    404: {
-        "FIELD_NOT_FOUND": Example(
-            summary="Поле не знайдено",
-            value=error_example("FIELD_NOT_FOUND", "Field not found", {"id": FIELD_ID}),
-        ),
-    },
-    422: {
-        "VALIDATION_ERROR": Example(
-            summary="Невалідні параметри або тіло",
-            value=error_example(
-                "VALIDATION_ERROR",
-                "Request validation failed",
-                [
-                    {
-                        "loc": ["query", "lat"],
-                        "msg": "Input should be less than or equal to 90",
-                        "type": "less_than_equal",
-                    }
-                ],
-            ),
-        ),
-    },
-    503: {
-        "DATABASE_UNAVAILABLE": Example(
-            summary="База недоступна",
-            value=error_example("DATABASE_UNAVAILABLE", "Database is unavailable"),
-        ),
-    },
+            "type": "uuid_parsing",
+        }
+    ],
 }
