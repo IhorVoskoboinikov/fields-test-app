@@ -6,6 +6,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    PlainSerializer,
     StringConstraints,
     field_serializer,
     model_validator,
@@ -23,6 +24,17 @@ Crop = Annotated[
     str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100, pattern=NO_NUL)
 ]
 Owner = Name
+
+# Поля відповідей (з прикладами для Swagger); площа у відповіді — з точністю до 0.01 га
+FieldId = Annotated[UUID, Field(examples=["8c7ff87a-cabd-48fa-bf7c-b47f94edc665"])]
+FieldName = Annotated[str, Field(examples=["Поле №1 - Пшениця"])]
+AreaHa = Annotated[
+    float,
+    PlainSerializer(lambda value: round(value, 2), return_type=float),
+    Field(description="Площа, га", examples=[79.0]),
+]
+CropName = Annotated[str, Field(examples=["Пшениця"])]
+OwnerName = Annotated[str, Field(examples=["Іванов І.І."])]
 
 DEFAULT_LIMIT = 20
 MAX_LIMIT = 100
@@ -44,21 +56,25 @@ class FieldCreate(BaseModel):
 class FieldListItem(BaseModel):
     """Поле в списку — без геометрії (менше даних із БД і по мережі)."""
 
-    id: UUID = Field(examples=["8c7ff87a-cabd-48fa-bf7c-b47f94edc665"])
-    name: str = Field(examples=["Поле №1 - Пшениця"])
-    area_ha: float = Field(description="Площа, га", examples=[79.0])
-    crop: str = Field(examples=["Пшениця"])
-    owner: str = Field(examples=["Іванов І.І."])
-
-    @field_serializer("area_ha")
-    def round_area(self, value: float) -> float:
-        return round(value, 2)
+    id: FieldId
+    name: FieldName
+    area_ha: AreaHa
+    crop: CropName
+    owner: OwnerName
 
 
-class FieldRead(FieldListItem):
-    """Поле з повною геометрією: відповідь GET /api/fields/{id} і POST /api/fields."""
+class FieldRead(BaseModel):
+    """Поле з повною геометрією: відповідь GET /api/fields/{id} і POST /api/fields.
 
+    Порядок полів — як у прикладі відповіді з ТЗ.
+    """
+
+    id: FieldId
+    name: FieldName
     geometry: PolygonGeometry
+    area_ha: AreaHa
+    crop: CropName
+    owner: OwnerName
     created_at: datetime = Field(examples=["2026-10-06T07:04:06Z"])
 
 
