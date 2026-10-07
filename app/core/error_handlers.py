@@ -14,9 +14,6 @@ from app.schemas.common import ErrorBody, ErrorResponse
 
 logger = get_logger(__name__)
 
-VALIDATION_ERROR_CODE = "VALIDATION_ERROR"
-VALIDATION_ERROR_MESSAGE = "Request validation failed"
-
 HTTP_ERROR_CODES = {
     400: "BAD_REQUEST",
     404: "NOT_FOUND",
@@ -57,8 +54,8 @@ async def validation_error_handler(request: Request, exc: RequestValidationError
     details = [
         {"loc": list(err["loc"]), "msg": err["msg"], "type": err["type"]} for err in exc.errors()
     ]
-    logger.warning("422 %s: %s", VALIDATION_ERROR_CODE, details)
-    return error_response(422, VALIDATION_ERROR_CODE, VALIDATION_ERROR_MESSAGE, details)
+    logger.warning("422 VALIDATION_ERROR: %s", details)
+    return error_response(422, "VALIDATION_ERROR", "Request validation failed", details)
 
 
 async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
