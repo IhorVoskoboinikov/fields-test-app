@@ -155,13 +155,13 @@ ORDER BY distance_to_center_m;
 - **JSON-логи, чистий ASGI-middleware**, метрики (Prometheus, `pg_stat_statements`), OpenTelemetry.
 - **Тести:** юніт-тести сервісу з моком репозиторію, навантажувальні (locust, k6), CI.
 
-## Розробка
+## Тести й лінтер
+
+Застосунок запускається лише через `docker compose` (див. «Швидкий старт»). Тести й бенчмарк
+запускаються на хості через [uv](https://docs.astral.sh/uv/):
 
 ```bash
-uv sync                          # залежності, включно з dev
-cp .env.example .env             # база на localhost:5433
-make db && make migrate          # PostGIS у Docker + міграції
-uv run uvicorn app.main:app --reload
+uv sync                          # залежності для тестів і бенчмарку
 make test                        # інтеграційні тести на справжньому PostGIS (testcontainers)
 make lint
 ```
