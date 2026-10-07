@@ -24,7 +24,7 @@ from testcontainers.community.postgres import PostgresContainer
 
 from app.dependencies.db import get_session
 from app.main import create_app
-from tests.helpers import TZ_FIELD
+from tests.helpers import TASK_FIELD
 
 POSTGIS_IMAGE = "postgis/postgis:16-3.4"
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -91,7 +91,7 @@ async def client(app: FastAPI) -> AsyncIterator[AsyncClient]:
 @pytest.fixture
 def create_field(client: AsyncClient) -> CreateField:
     async def factory(**overrides: Any) -> dict[str, Any]:
-        response = await client.post("/api/fields", json={**TZ_FIELD, **overrides})
+        response = await client.post("/api/fields", json={**TASK_FIELD, **overrides})
         assert response.status_code == 201, response.text
         return response.json()
 

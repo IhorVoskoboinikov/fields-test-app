@@ -16,20 +16,20 @@ def polygon(*ring: tuple[float, float]) -> dict[str, Any]:
     return {"type": "Polygon", "coordinates": [[list(point) for point in ring]]}
 
 
-TZ_GEOMETRY = polygon(
+TASK_GEOMETRY = polygon(
     (30.5234, 50.4501),
     (30.5334, 50.4501),
     (30.5334, 50.4601),
     (30.5234, 50.4601),
     (30.5234, 50.4501),
 )
-TZ_FIELD = {
+TASK_FIELD = {
     "name": "Поле №1 - Пшениця",
-    "geometry": TZ_GEOMETRY,
+    "geometry": TASK_GEOMETRY,
     "crop": "Пшениця",
     "owner": "Іванов І.І.",
 }
-TZ_POINT = {"lon": 30.5250, "lat": 50.4550}
+TASK_POINT = {"lon": 30.5250, "lat": 50.4550}
 
 # «Метелик» (вісімка): сторони перетинаються
 BOWTIE = polygon((30.0, 50.0), (30.02, 50.02), (30.02, 50.0), (30.0, 50.02), (30.0, 50.0))

@@ -14,7 +14,7 @@ from app.core.exceptions import (
 REQUEST_ID = "3f2a9c1e-7d4b-4c1a-9a0e-2b5f6c7d8e9f"
 FIELD_ID = "8c7ff87a-cabd-48fa-bf7c-b47f94edc665"
 
-TZ_POLYGON = {
+TASK_POLYGON = {
     "type": "Polygon",
     "coordinates": [
         [
@@ -26,24 +26,24 @@ TZ_POLYGON = {
         ]
     ],
 }
-TZ_FIELD = {
+TASK_FIELD = {
     "name": "Поле №1 - Пшениця",
-    "geometry": TZ_POLYGON,
+    "geometry": TASK_POLYGON,
     "crop": "Пшениця",
     "owner": "Іванов І.І.",
 }
 
 FIELD_CREATE_EXAMPLES: dict[str, Example] = {
-    "tz": Example(
+    "task": Example(
         summary="Поле з ТЗ → 201",
         description="Тіло з прикладу ТЗ. Площа на еліпсоїді — 79.00 га.",
-        value=TZ_FIELD,
+        value=TASK_FIELD,
     ),
     "bowtie": Example(
         summary="Самоперетин («метелик») → 400",
         description="Сторони перетинаються, як у вісімці: `ST_IsValid` = false.",
         value={
-            **TZ_FIELD,
+            **TASK_FIELD,
             "name": "Метелик",
             "geometry": {
                 "type": "Polygon",
@@ -57,7 +57,7 @@ FIELD_CREATE_EXAMPLES: dict[str, Example] = {
         summary="Менше 0.1 га → 400",
         description="Квадрат приблизно 7 × 11 м — близько 0.008 га.",
         value={
-            **TZ_FIELD,
+            **TASK_FIELD,
             "name": "Замале поле",
             "geometry": {
                 "type": "Polygon",
@@ -77,9 +77,9 @@ FIELD_CREATE_EXAMPLES: dict[str, Example] = {
         summary="Незамкнене кільце → 422",
         description="Перша точка не дорівнює останній — відхиляє Pydantic.",
         value={
-            **TZ_FIELD,
+            **TASK_FIELD,
             "name": "Незамкнене",
-            "geometry": {"type": "Polygon", "coordinates": [TZ_POLYGON["coordinates"][0][:-1]]},
+            "geometry": {"type": "Polygon", "coordinates": [TASK_POLYGON["coordinates"][0][:-1]]},
         },
     ),
 }

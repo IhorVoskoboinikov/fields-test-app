@@ -1,7 +1,7 @@
 from httpx import AsyncClient
 
 from tests.conftest import CreateField
-from tests.helpers import TZ_POINT, make_square, polygon
+from tests.helpers import TASK_POINT, make_square, polygon
 
 
 async def test_find_by_point_returns_overlapping_fields(
@@ -22,10 +22,10 @@ async def test_find_by_point_returns_overlapping_fields(
     assert distances == sorted(distances)
 
 
-async def test_find_by_point_tz_example(client: AsyncClient, create_field: CreateField) -> None:
+async def test_find_by_point_task_example(client: AsyncClient, create_field: CreateField) -> None:
     created = await create_field()
 
-    response = await client.get("/api/fields/find-by-point", params=TZ_POINT)
+    response = await client.get("/api/fields/find-by-point", params=TASK_POINT)
 
     fields = response.json()["fields"]
     assert [f["id"] for f in fields] == [created["id"]]
