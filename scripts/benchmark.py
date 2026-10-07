@@ -26,7 +26,6 @@ Point = tuple[float, float]
 
 
 async def make_points(engine: AsyncEngine, count: int, seed: int) -> list[Point]:
-    """Половина точок — усередині випадкових полів, половина — випадково по кластерах."""
     rng = random.Random(seed)
     surface = func.ST_PointOnSurface(Field.geom)
     async with engine.connect() as conn:
@@ -75,7 +74,6 @@ async def run(points: list[Point], use_index: bool) -> dict[str, float]:
 
 
 async def main_async(points_count: int, mode: str, seed: int) -> None:
-    """Готує точки, проганяє обрані режими і друкує рядки таблиці для README."""
     engine = create_engine()
     try:
         async with engine.connect() as conn:
@@ -98,7 +96,6 @@ async def main_async(points_count: int, mode: str, seed: int) -> None:
 
 
 def main() -> None:
-    """Точка входу CLI."""
     parser = argparse.ArgumentParser(description="Benchmark find-by-point SQL query.")
     parser.add_argument("--points", type=int, default=1000, help="кількість точок запиту")
     parser.add_argument("--mode", choices=["both", "index", "no-index"], default="both")

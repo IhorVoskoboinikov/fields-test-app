@@ -1,5 +1,3 @@
-"""Службове: /health, request_id, єдиний формат помилок для невідомих роутів."""
-
 from httpx import AsyncClient
 
 

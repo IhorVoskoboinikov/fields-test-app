@@ -59,7 +59,7 @@ CROPS: dict[str, int] = {  # культура → вага (основні ча�
 }
 
 AREA_HA = (0.5, 300)  # нижня межа гарантує «> 0.1 га»
-ASPECT = (1, 4)  # співвідношення сторін прямокутника
+ASPECT = (1, 4)  # співвідношення сторін
 OVERLAP_SHIFT = (0.3, 0.6)  # зсув центру перекриваючого поля, частка розміру базового
 
 SURNAMES = [
@@ -87,7 +87,6 @@ class Rect:
     angle: float
 
     def ring(self) -> list[tuple[float, float]]:
-        """Замкнене кільце вершин [lon, lat]. Метри → градуси на широті центру."""
         dlat_per_m = 1 / METERS_PER_DEGREE_LAT
         dlon_per_m = 1 / (METERS_PER_DEGREE_LAT * math.cos(math.radians(self.lat)))
         cos_a, sin_a = math.cos(self.angle), math.sin(self.angle)
@@ -106,8 +105,6 @@ class Rect:
 
 @dataclass(frozen=True, slots=True)
 class DemoField:
-    """Демо-поле з фіксованими координатами (для прикладів із ТЗ і README)."""
-
     name: str
     crop: str
     owner: str
@@ -115,7 +112,6 @@ class DemoField:
 
 
 def box(lon1: float, lat1: float, lon2: float, lat2: float) -> list[tuple[float, float]]:
-    """Прямокутник, вирівняний за осями, як замкнене кільце."""
     return [(lon1, lat1), (lon2, lat1), (lon2, lat2), (lon1, lat2), (lon1, lat1)]
 
 
@@ -151,7 +147,6 @@ DEMO_POINTS = [
 
 
 def make_owners(rng: random.Random, count: int = 100) -> list[str]:
-    """~100 власників: фізособи («Іванов І.І.») і юрособи (ТОВ "Агро-…", ФГ "…")."""
     people = {"Іванов І.І."}
     while len(people) < count // 2:
         people.add(f"{rng.choice(SURNAMES)} {rng.choice(INITIALS)}.{rng.choice(INITIALS)}.")
@@ -196,12 +191,10 @@ def overlapping_rect(rng: random.Random, base: Rect) -> Rect:
 
 
 def to_ewkt(ring: list[tuple[float, float]]) -> str:
-    """Кільце → EWKT `SRID=4326;POLYGON((lon lat, ...))`."""
     return "SRID=4326;POLYGON((" + ", ".join(f"{lon} {lat}" for lon, lat in ring) + "))"
 
 
 def generate(count: int, seed: int, overlap_ratio: float) -> tuple[list[dict], int]:
-    """Рядки для вставки: демо-поля + випадкові. Повертає (рядки, кількість перекриттів)."""
     rng = random.Random(seed)
     owners = make_owners(rng)
     crops, weights = list(CROPS), list(CROPS.values())
@@ -267,7 +260,6 @@ async def seed(count: int, seed_value: int, truncate: bool, overlap_ratio: float
 
 
 def main() -> None:
-    """Точка входу CLI."""
     parser = argparse.ArgumentParser(description="Seed the fields table with test data.")
     parser.add_argument("--count", type=int, default=2000, help="кількість полів (≥ 1000 за ТЗ)")
     parser.add_argument("--seed", type=int, default=42, help="seed генератора — однакові дані")

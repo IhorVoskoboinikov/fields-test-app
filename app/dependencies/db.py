@@ -1,5 +1,3 @@
-"""Сесія БД на час одного HTTP-запиту."""
-
 from collections.abc import AsyncIterator
 from typing import Annotated
 

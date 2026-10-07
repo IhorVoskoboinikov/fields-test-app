@@ -1,5 +1,3 @@
-"""Схеми полів: тіла запитів і відповідей рівно як у ТЗ, query-параметри моделями."""
-
 from datetime import datetime
 from typing import Annotated, Self
 from uuid import UUID
@@ -54,7 +52,6 @@ class FieldListItem(BaseModel):
 
     @field_serializer("area_ha")
     def round_area(self, value: float) -> float:
-        """Площа в гектарах з точністю до 0.01 га."""
         return round(value, 2)
 
 
@@ -88,7 +85,6 @@ class FieldListQuery(BaseModel):
 
     @model_validator(mode="after")
     def check_area_range(self) -> Self:
-        """`min_area` не може бути більшим за `max_area`."""
         if (
             self.min_area is not None
             and self.max_area is not None
@@ -107,7 +103,6 @@ class FieldMatch(FieldListItem):
 
     @field_serializer("distance_to_center_m")
     def round_distance(self, value: float) -> float:
-        """Відстань у метрах з точністю до 0.1 м."""
         return round(value, 1)
 
 
@@ -127,7 +122,6 @@ class FindByPointResponse(BaseModel):
 
     @field_serializer("query_time_ms")
     def round_query_time(self, value: float) -> float:
-        """Час SQL-запиту пошуку в мілісекундах з точністю до 0.01 мс."""
         return round(value, 2)
 
 

@@ -1,5 +1,3 @@
-"""Спільні схеми: єдиний формат помилки та відповідь /health."""
-
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field

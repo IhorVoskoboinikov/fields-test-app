@@ -1,5 +1,3 @@
-"""Спільні дані для тестів: квадрати заданого розміру і невалідні полігони."""
-
 import math
 from typing import Any
 
@@ -15,11 +13,9 @@ def make_square(lon: float, lat: float, side_m: float) -> dict[str, Any]:
 
 
 def polygon(*ring: tuple[float, float]) -> dict[str, Any]:
-    """GeoJSON Polygon з одного кільця."""
     return {"type": "Polygon", "coordinates": [[list(point) for point in ring]]}
 
 
-# Поле з прикладу ТЗ
 TZ_GEOMETRY = polygon(
     (30.5234, 50.4501),
     (30.5334, 50.4501),
@@ -47,8 +43,6 @@ ARMPIT = polygon(
 # Квадрат ~7 × 11 м — близько 0.008 га
 TINY = polygon((30.0, 50.0), (30.0001, 50.0), (30.0001, 50.0001), (30.0, 50.0001), (30.0, 50.0))
 
-# Кільце не замкнене: остання точка не дорівнює першій
 OPEN_RING = polygon((30.0, 50.0), (30.02, 50.0), (30.02, 50.02), (30.0, 50.02))
 
-# Довгота поза діапазоном
 LON_200 = polygon((200.0, 50.0), (30.02, 50.0), (30.02, 50.02), (200.0, 50.0))

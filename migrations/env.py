@@ -1,5 +1,3 @@
-"""Оточення Alembic: async-engine, метадані моделей і хелпери GeoAlchemy2."""
-
 import asyncio
 from logging.config import fileConfig
 
@@ -49,21 +47,18 @@ def _configure(**kwargs) -> None:
 
 
 def run_migrations_offline() -> None:
-    """Генерація SQL без підключення до бази (`alembic upgrade --sql`)."""
     _configure(url=get_url(), literal_binds=True, dialect_opts={"paramstyle": "named"})
     with context.begin_transaction():
         context.run_migrations()
 
 
 def do_run_migrations(connection: Connection) -> None:
-    """Застосовує міграції на вже відкритому з'єднанні."""
     _configure(connection=connection)
     with context.begin_transaction():
         context.run_migrations()
 
 
 async def run_async_migrations() -> None:
-    """Відкриває async-з'єднання і запускає міграції в синхронному контексті."""
     connectable = create_async_engine(get_url(), poolclass=pool.NullPool)
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)
@@ -71,7 +66,6 @@ async def run_async_migrations() -> None:
 
 
 def run_migrations_online() -> None:
-    """Міграції з підключенням до бази."""
     asyncio.run(run_async_migrations())
 
 

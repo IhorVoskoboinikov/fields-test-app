@@ -1,5 +1,3 @@
-"""Службовий ендпоінт /health: застосунок живий і база відповідає. Його ж використовує Docker."""
-
 from fastapi import APIRouter
 
 from app.core.exceptions import DatabaseUnavailableError
@@ -21,7 +19,6 @@ logger = get_logger(__name__)
     responses=error_responses(503),
 )
 async def health(session: SessionDep) -> HealthResponse:
-    """Виконує `SELECT 1`; будь-яка помилка з'єднання → 503."""
     try:
         await ping_database(session)
     except Exception as exc:

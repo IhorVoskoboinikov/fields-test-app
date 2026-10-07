@@ -1,5 +1,3 @@
-"""Роутер /api/fields — шляхи, параметри і тіла відповідей рівно як у ТЗ."""
-
 from typing import Annotated
 from uuid import UUID
 
@@ -36,7 +34,6 @@ async def create_field(
     body: Annotated[FieldCreate, Body(openapi_examples=FIELD_CREATE_EXAMPLES)],
     service: FieldServiceDep,
 ) -> FieldRead:
-    """Створення нового поля."""
     return await service.create_field(body)
 
 
@@ -53,7 +50,6 @@ async def create_field(
 async def list_fields(
     query: Annotated[FieldListQuery, Query()], service: FieldServiceDep
 ) -> FieldListResponse:
-    """Список полів з фільтрацією та пагінацією."""
     return await service.list_fields(query)
 
 
@@ -74,7 +70,6 @@ async def list_fields(
 async def find_fields_by_point(
     query: Annotated[PointQuery, Query()], service: FieldServiceDep
 ) -> FindByPointResponse:
-    """Пошук полів, що містять задану точку."""
     return await service.find_by_point(query)
 
 
@@ -86,5 +81,4 @@ async def find_fields_by_point(
     responses=error_responses(404, 422),
 )
 async def get_field(field_id: UUID, service: FieldServiceDep) -> FieldRead:
-    """Деталі поля з повною геометрією."""
     return await service.get_field(field_id)

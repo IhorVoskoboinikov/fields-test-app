@@ -34,7 +34,6 @@ CreateField = Callable[..., Awaitable[dict[str, Any]]]
 
 @pytest.fixture(scope="session")
 def postgres_url() -> Iterator[str]:
-    """Піднімає PostGIS у контейнері на всю сесію тестів і віддає async-URL."""
     with PostgresContainer(POSTGIS_IMAGE, driver="asyncpg") as postgres:
         yield postgres.get_connection_url()
 
@@ -54,7 +53,6 @@ def migrated_db(postgres_url: str) -> str:
 
 @pytest.fixture(scope="session")
 async def engine(migrated_db: str) -> AsyncIterator[AsyncEngine]:
-    """Async-engine тестової бази на всю сесію."""
     engine = create_async_engine(migrated_db)
     yield engine
     await engine.dispose()
@@ -73,7 +71,6 @@ async def clean_db(engine: AsyncEngine) -> AsyncIterator[None]:
 
 @pytest.fixture
 def app(engine: AsyncEngine) -> FastAPI:
-    """Застосунок із сесією на тестову базу через `dependency_overrides`."""
     session_factory = async_sessionmaker(engine, expire_on_commit=False)
 
     async def override_get_session() -> AsyncIterator[AsyncSession]:
@@ -87,15 +84,12 @@ def app(engine: AsyncEngine) -> FastAPI:
 
 @pytest.fixture
 async def client(app: FastAPI) -> AsyncIterator[AsyncClient]:
-    """HTTP-клієнт, що викликає застосунок напряму, без мережі."""
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         yield client
 
 
 @pytest.fixture
 def create_field(client: AsyncClient) -> CreateField:
-    """Фабрика: створює поле через POST і повертає JSON відповіді."""
-
     async def factory(**overrides: Any) -> dict[str, Any]:
         response = await client.post("/api/fields", json={**TZ_FIELD, **overrides})
         assert response.status_code == 201, response.text

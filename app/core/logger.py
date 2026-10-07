@@ -1,9 +1,3 @@
-"""Логування: один текстовий формат, request_id у кожному рядку.
-
-Request_id зберігається в contextvar; middleware ставить його на вході запиту,
-а фільтр додає до кожного запису логу. Поза запитом у лозі стоїть `-`.
-"""
-
 import logging
 from contextvars import ContextVar
 from logging.config import dictConfig
@@ -15,8 +9,6 @@ DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
 class RequestIdFilter(logging.Filter):
-    """Додає `request_id` поточного запиту до кожного запису логу."""
-
     def filter(self, record: logging.LogRecord) -> bool:
         record.request_id = request_id_ctx.get()
         return True
@@ -53,5 +45,4 @@ def setup_logging(level: str = "INFO") -> None:
 
 
 def get_logger(name: str) -> logging.Logger:
-    """Повертає логер модуля: `get_logger(__name__)`."""
     return logging.getLogger(name)

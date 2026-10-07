@@ -1,5 +1,3 @@
-"""Базовий клас ORM-моделей з єдиною схемою імен індексів і констрейнтів."""
-
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase
 
@@ -15,6 +13,4 @@ NAMING_CONVENTION = {
 
 
 class Base(DeclarativeBase):
-    """Базовий клас усіх ORM-моделей."""
-
     metadata = MetaData(naming_convention=NAMING_CONVENTION)

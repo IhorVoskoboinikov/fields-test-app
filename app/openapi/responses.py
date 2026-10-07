@@ -1,5 +1,3 @@
-"""Спільні `responses` для ендпоінтів: модель `ErrorResponse` і приклади на кожен код."""
-
 from typing import Any
 
 from app.openapi.examples import DOMAIN_ERROR_EXAMPLES

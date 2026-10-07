@@ -1,5 +1,3 @@
-"""Точка входу: `create_app()` збирає роутери, middleware, обробники помилок і lifespan."""
-
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -38,7 +36,6 @@ OPENAPI_TAGS = [
 
 
 def operation_id(route: APIRoute) -> str:
-    """Короткий operation_id з імені функції: `create_field`, `find_fields_by_point`."""
     return route.name
 
 
@@ -62,7 +59,6 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 def create_app() -> FastAPI:
-    """Створює FastAPI-застосунок."""
     setup_logging(get_settings().log_level)
 
     app = FastAPI(

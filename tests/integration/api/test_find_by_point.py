@@ -1,5 +1,3 @@
-"""GET /api/fields/find-by-point — основний ендпоінт: поля, що містять точку."""
-
 from httpx import AsyncClient
 
 from tests.conftest import CreateField

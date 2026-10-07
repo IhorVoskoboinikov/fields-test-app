@@ -28,7 +28,6 @@ logger = get_logger("app.middleware")
 
 
 def resolve_request_id(header_value: str | None) -> str:
-    """Повертає request_id із заголовка, якщо він валідний, інакше — новий UUID."""
     if header_value and VALID_REQUEST_ID.match(header_value):
         return header_value
     return str(uuid.uuid4())
@@ -37,7 +36,6 @@ def resolve_request_id(header_value: str | None) -> str:
 async def request_id_middleware(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
-    """Ставить request_id, ловить необроблені винятки, пише access-лог."""
     request_id = resolve_request_id(request.headers.get(REQUEST_ID_HEADER))
     token = request_id_ctx.set(request_id)
     started = time.perf_counter()

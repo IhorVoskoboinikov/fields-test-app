@@ -1,5 +1,3 @@
-"""ORM-модель сільськогосподарського поля."""
-
 import uuid
 from datetime import datetime
 

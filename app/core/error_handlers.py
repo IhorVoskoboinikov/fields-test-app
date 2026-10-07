@@ -1,5 +1,3 @@
-"""Перетворення винятків на HTTP-відповіді в єдиному форматі `{"error": {...}}`."""
-
 import logging
 from typing import Any
 
@@ -43,7 +41,6 @@ def error_response(
 
 
 async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
-    """Доменні винятки: статус і код беруться з самого винятку. 4xx — WARNING, 5xx — ERROR."""
     level = logging.ERROR if exc.status_code >= 500 else logging.WARNING
     logger.log(level, "%s %s: %s %s", exc.status_code, exc.code, exc.message, exc.details or "")
     return error_response(exc.status_code, exc.code, exc.message, exc.details)
@@ -59,7 +56,6 @@ async def validation_error_handler(request: Request, exc: RequestValidationError
 
 
 async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
-    """HTTP-винятки Starlette (немає роуту, метод не дозволено тощо) у тому самому форматі."""
     code = HTTP_ERROR_CODES.get(exc.status_code, f"HTTP_{exc.status_code}")
     logger.warning("%s %s: %s", exc.status_code, code, exc.detail)
     return error_response(exc.status_code, code, str(exc.detail), headers=exc.headers)

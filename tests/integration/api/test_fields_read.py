@@ -1,5 +1,3 @@
-"""GET /api/fields/{id} і GET /api/fields: деталі поля, список, фільтри, пагінація."""
-
 import uuid
 
 from httpx import AsyncClient

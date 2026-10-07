@@ -1,5 +1,3 @@
-"""SQL-запити до таблиці `fields`. Уся геометрія рахується і перевіряється в PostGIS."""
-
 from dataclasses import dataclass
 from typing import Any
 from uuid import UUID
@@ -14,18 +12,14 @@ from app.db.models import Field
 # GeoAlchemy2 рендерить geography(GEOMETRY,-1) і PostGIS пише NOTICE
 GEOGRAPHY = Geography(srid=4326)
 
-# Геометрія у відповідях: GeoJSON прямо з PostGIS (`ST_AsGeoJSON(geom)::json`)
 GEOMETRY_JSON = cast(func.ST_AsGeoJSON(Field.geom), JSON).label("geometry")
 
-# Колонки поля без геометрії (для списку) і з нею (для деталей)
 LIST_COLUMNS = (Field.id, Field.name, Field.area_ha, Field.crop, Field.owner)
 DETAIL_COLUMNS = (*LIST_COLUMNS, Field.created_at, GEOMETRY_JSON)
 
 
 @dataclass(frozen=True, slots=True)
 class GeometryCheck:
-    """Результат перевірки полігона в PostGIS до вставки."""
-
     is_valid: bool
     reason: str
     area_ha: float | None  # None для невалідного полігона
@@ -33,8 +27,6 @@ class GeometryCheck:
 
 @dataclass(frozen=True, slots=True)
 class FieldFilters:
-    """Фільтри списку; `None` — фільтр не застосовується."""
-
     crop: str | None = None
     owner: str | None = None
     min_area: float | None = None
@@ -85,7 +77,6 @@ class FieldRepository:
         return dict(row)
 
     async def get_by_id(self, field_id: UUID) -> dict[str, Any] | None:
-        """Поле з геометрією за id або `None`."""
         stmt = select(*DETAIL_COLUMNS).where(Field.id == field_id)
         row = (await self.session.execute(stmt)).mappings().one_or_none()
         return dict(row) if row else None
@@ -141,7 +132,6 @@ class FieldRepository:
 
     @staticmethod
     def _apply_filters(stmt: Select, filters: FieldFilters) -> Select:
-        """Додає умову WHERE лише для переданих фільтрів."""
         if filters.crop is not None:
             stmt = stmt.where(Field.crop == filters.crop)
         if filters.owner is not None:

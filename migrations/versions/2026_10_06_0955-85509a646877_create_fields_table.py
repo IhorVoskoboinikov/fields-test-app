@@ -21,7 +21,6 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    """Таблиця `fields`: полігони в SRID 4326, площа — generated column, індекси."""
     op.execute("CREATE EXTENSION IF NOT EXISTS postgis")
 
     op.create_table(

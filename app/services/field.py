@@ -1,5 +1,3 @@
-"""Бізнес-логіка полів: валідація геометрії й площі, межі транзакцій."""
-
 import time
 from uuid import UUID
 
@@ -57,7 +55,6 @@ class FieldService:
         return FieldRead.model_validate(row)
 
     async def get_field(self, field_id: UUID) -> FieldRead:
-        """Поле з повною геометрією; немає такого id → FieldNotFoundError."""
         async with self.session.begin():
             row = await self.repo.get_by_id(field_id)
         if row is None:

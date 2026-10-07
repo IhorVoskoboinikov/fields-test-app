@@ -1,5 +1,3 @@
-"""Доменні винятки. Сервіс кидає їх, а в HTTP-відповідь перетворює `error_handlers`."""
-
 from typing import Any
 from uuid import UUID
 
@@ -7,8 +5,6 @@ MIN_FIELD_AREA_HA = 0.1
 
 
 class AppError(Exception):
-    """Базовий виняток застосунку: HTTP-статус, машинний код і зрозуміле повідомлення."""
-
     status_code: int = 500
     code: str = "INTERNAL_ERROR"
     message: str = "Internal server error"
@@ -20,8 +16,6 @@ class AppError(Exception):
 
 
 class FieldNotFoundError(AppError):
-    """Поле з таким id не існує."""
-
     status_code = 404
     code = "FIELD_NOT_FOUND"
     message = "Field not found"
@@ -42,8 +36,6 @@ class InvalidGeometryError(AppError):
 
 
 class FieldAreaTooSmallError(AppError):
-    """Площа поля не більша за мінімальну (0.1 га)."""
-
     status_code = 400
     code = "FIELD_AREA_TOO_SMALL"
     message = f"Field area must be greater than {MIN_FIELD_AREA_HA} ha"
@@ -53,8 +45,6 @@ class FieldAreaTooSmallError(AppError):
 
 
 class DatabaseUnavailableError(AppError):
-    """База даних не відповідає (використовується в /health)."""
-
     status_code = 503
     code = "DATABASE_UNAVAILABLE"
     message = "Database is unavailable"

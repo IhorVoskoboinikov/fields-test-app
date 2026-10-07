@@ -48,7 +48,6 @@ class PolygonGeometry(BaseModel):
     @field_validator("coordinates")
     @classmethod
     def check_rings(cls, rings: list[list[tuple[float, float]]]) -> list[list[tuple[float, float]]]:
-        """Кожне кільце: ≥ 4 точок, замкнене, ребра вужчі за 180° довготи; всього ≤ MAX_VERTICES."""
         total = 0
         for index, ring in enumerate(rings):
             if len(ring) < MIN_RING_POSITIONS:

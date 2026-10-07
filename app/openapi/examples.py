@@ -1,8 +1,3 @@
-"""Приклади для Swagger: сценарії тіла POST і тіла помилок.
-
-Приклади успішних відповідей описані в самих Pydantic-схемах (`Field(examples=...)`).
-"""
-
 from typing import Any
 from uuid import UUID
 
@@ -19,7 +14,6 @@ from app.core.exceptions import (
 REQUEST_ID = "3f2a9c1e-7d4b-4c1a-9a0e-2b5f6c7d8e9f"
 FIELD_ID = "8c7ff87a-cabd-48fa-bf7c-b47f94edc665"
 
-# Поле з прикладу ТЗ
 TZ_POLYGON = {
     "type": "Polygon",
     "coordinates": [
@@ -92,7 +86,6 @@ FIELD_CREATE_EXAMPLES: dict[str, Example] = {
 
 
 def error_body(code: str, message: str, details: Any = None) -> dict[str, Any]:
-    """Тіло помилки в єдиному форматі (як у `error_response`: без `details`, якщо їх немає)."""
     error: dict[str, Any] = {"code": code, "message": message}
     if details is not None:
         error["details"] = details

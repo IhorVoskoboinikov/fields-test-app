@@ -1,5 +1,3 @@
-"""Налаштування застосунку: усе читається зі змінних оточення або файлу `.env`."""
-
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -39,5 +37,4 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
-    """Повертає єдиний екземпляр налаштувань (створюється при першому виклику)."""
     return Settings()

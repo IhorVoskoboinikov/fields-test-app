@@ -20,7 +20,6 @@ logger = logging.getLogger("wait_for_db")
 
 
 async def check_db() -> None:
-    """Один раз перевіряє з'єднання і наявність PostGIS; кидає виняток, якщо не готово."""
     engine = create_engine()
     try:
         async with engine.connect() as conn:
@@ -35,7 +34,6 @@ async def check_db() -> None:
 
 
 async def wait_for_db() -> bool:
-    """Повторює перевірку до MAX_ATTEMPTS разів; повертає True, якщо база готова."""
     for attempt in range(1, MAX_ATTEMPTS + 1):
         try:
             await check_db()
@@ -49,7 +47,6 @@ async def wait_for_db() -> bool:
 
 
 def main() -> None:
-    """Точка входу: код виходу 0 — база готова, 1 — ні."""
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
     )

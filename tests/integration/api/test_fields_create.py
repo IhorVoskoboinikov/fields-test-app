@@ -1,5 +1,3 @@
-"""POST /api/fields: створення поля і валідація полігона."""
-
 import re
 
 import pytest
