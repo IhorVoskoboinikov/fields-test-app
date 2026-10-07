@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.exceptions import AppError
-from app.core.logger import get_logger, request_id_ctx
+from app.core.logger import get_logger
 from app.schemas.common import ErrorBody, ErrorResponse
 
 logger = get_logger(__name__)
@@ -26,15 +26,11 @@ def error_response(
     details: Any = None,
     headers: dict[str, str] | None = None,
 ) -> JSONResponse:
-    """Будує JSON-відповідь помилки з request_id поточного запиту.
+    """Будує JSON-відповідь помилки; `details` є лише тоді, коли деталі є (`exclude_none`).
 
-    `details` є у відповіді лише тоді, коли деталі є (`exclude_none`).
+    request_id у тіло не дублюємо: його додає middleware в заголовок `X-Request-ID`.
     """
-    body = ErrorResponse(
-        error=ErrorBody(
-            code=code, message=message, details=details, request_id=request_id_ctx.get()
-        )
-    )
+    body = ErrorResponse(error=ErrorBody(code=code, message=message, details=details))
     return JSONResponse(
         status_code=status_code, content=body.model_dump(exclude_none=True), headers=headers
     )

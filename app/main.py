@@ -25,8 +25,8 @@ REST API сільськогосподарських полів зі швидки
 3. `GET /api/fields?crop=Пшениця&min_area=50&limit=5` — список з фільтрами.
 
 Координати — у порядку GeoJSON `[lon, lat]`, SRID 4326.
-Усі помилки — в єдиному форматі `{"error": {code, message, details, request_id}}`;
-`request_id` також приходить у заголовку `X-Request-ID`.
+Усі помилки — в єдиному форматі `{"error": {code, message, details}}`;
+`request_id` запиту приходить у заголовку `X-Request-ID` (і є в кожному рядку логу).
 """
 
 OPENAPI_TAGS = [

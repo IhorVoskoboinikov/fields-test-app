@@ -7,7 +7,8 @@
 5. Скидає contextvar.
 
 Чому 500 ловимо тут: стандартний catch-all Starlette працює в зовнішньому
-`ServerErrorMiddleware`, де contextvar уже скинуто, — у лозі й відповіді не було б request_id.
+`ServerErrorMiddleware`, де contextvar уже скинуто, — у лозі й заголовку відповіді
+не було б request_id.
 """
 
 import re

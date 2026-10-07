@@ -4,12 +4,11 @@ from pydantic import BaseModel, Field
 
 
 class ErrorBody(BaseModel):
-    """Тіло помилки: машинний код, повідомлення, деталі та request_id для пошуку в логах."""
+    """Тіло помилки: машинний код, повідомлення і деталі (request_id — у `X-Request-ID`)."""
 
     code: str = Field(examples=["FIELD_NOT_FOUND"])
     message: str = Field(examples=["Field not found"])
     details: Any = Field(None, description="Деталі помилки; поля немає, якщо деталей немає")
-    request_id: str = Field(examples=["3f2a9c1e-7d4b-4c1a-9a0e-2b5f6c7d8e9f"])
 
 
 class ErrorResponse(BaseModel):

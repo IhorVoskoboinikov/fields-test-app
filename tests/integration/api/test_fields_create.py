@@ -53,8 +53,9 @@ async def test_create_field_rejects_invalid_polygon(
     assert response.status_code == status_code
     error = response.json()["error"]
     assert error["code"] == code
-    # request_id у тілі помилки збігається із заголовком — по ньому шукаємо в логах
-    assert error["request_id"] == response.headers["X-Request-ID"]
+    # request_id — лише в заголовку, у тілі помилки його не дублюємо
+    assert response.headers["X-Request-ID"]
+    assert "request_id" not in error
 
 
 async def test_invalid_geometry_reports_reason_with_location(client: AsyncClient) -> None:

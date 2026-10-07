@@ -11,7 +11,6 @@ from app.core.exceptions import (
     InvalidGeometryError,
 )
 
-REQUEST_ID = "3f2a9c1e-7d4b-4c1a-9a0e-2b5f6c7d8e9f"
 FIELD_ID = "8c7ff87a-cabd-48fa-bf7c-b47f94edc665"
 
 TASK_POLYGON = {
@@ -89,7 +88,6 @@ def error_body(code: str, message: str, details: Any = None) -> dict[str, Any]:
     error: dict[str, Any] = {"code": code, "message": message}
     if details is not None:
         error["details"] = details
-    error["request_id"] = REQUEST_ID
     return {"error": error}
 
 

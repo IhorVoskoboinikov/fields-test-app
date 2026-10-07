@@ -71,7 +71,7 @@ curl -s localhost:8000/api/fields/<id>
 - **Список** — `{total, fields}` без геометрії, нові зверху; `limit` 1–100 (типово 20).
 - **find-by-point** — усі поля, що містять точку (кілька, якщо поля перекриваються), за відстанню до
   центру поля; `query_time_ms` — час SQL-запиту пошуку.
-- **Помилки** — єдиний формат `{"error": {code, message, details, request_id}}` (`details` — лише якщо є); `request_id` також
+- **Помилки** — єдиний формат `{"error": {code, message, details}}` (`details` — лише якщо є); `request_id` запиту —
   у заголовку `X-Request-ID` і в кожному рядку логу.
 
 ## Архітектурні рішення
