@@ -13,8 +13,8 @@ PostgreSQL 16 + PostGIS 3.4, Docker Compose, uv, pytest + testcontainers.
 ```bash
 git clone https://github.com/IhorVoskoboinikov/fields-test-app.git && cd fields-test-app
 cp .env.example .env            # необов'язково: без .env діють ті самі значення за замовчуванням
-docker compose up -d --build    # db → міграції → сиди (2000 полів) → api, а також pgAdmin
-docker compose ps               # дочекатися, поки api стане healthy
+docker compose up -d --build    # db → міграції → сиди (2000 полів) і api, а також pgAdmin
+docker compose ps -a            # api — healthy, migrate і seed — Exited (0)
 ```
 
 Налаштування бази й логування — у `.env` (шаблон з коментарями — `.env.example`).
@@ -31,8 +31,9 @@ curl -s -X POST localhost:8000/api/fields \
 # список з фільтрами (кирилицю в query передаємо через --data-urlencode)
 curl -sG localhost:8000/api/fields --data-urlencode "crop=Пшениця" -d min_area=50 -d limit=5
 
-# деталі поля з геометрією
-curl -s localhost:8000/api/fields/<id>
+# деталі поля з геометрією: підставте id з відповіді POST вище
+ID="<id>"
+curl -s localhost:8000/api/fields/$ID
 ```
 
 | Що | Де |
@@ -107,7 +108,7 @@ ORDER BY distance_to_center_m;
 | невалідний полігон відхиляємо, а не виправляємо | ТЗ вимагає валідації; `ST_MakeValid` мовчки змінив би форму поля |
 | `total` окремим `count(*)` | коректний навіть для порожньої сторінки (`offset` > кількості) |
 | CHECK-констрейнти `ST_IsValid` і `area_ha > 0.1` | страхують запис в обхід API (сиди) |
-| middleware з `X-Request-ID` | трасування запиту від входу до логу і тіла помилки |
+| middleware з `X-Request-ID` | трасування запиту: request_id у кожному рядку логу й у заголовку відповіді |
 
 **Продуктивність** (`make bench`: 1000 точок, лише SQL-запит пошуку):
 
@@ -120,8 +121,8 @@ ORDER BY distance_to_center_m;
 З індексом час майже не росте з обсягом даних, без індексу — росте лінійно. `EXPLAIN ANALYZE` на
 100 000 полів: `Index Scan using ix_fields_geom`, 0.28 мс проти `Parallel Seq Scan`, 126 мс.
 
-**Сиди** (`scripts/seed.py`): 2000 відтворюваних полів у 10 сільгоспкластерах України, різних розмірів
-(0.5–300 га), культур і власників, 10% полів перекриваються; плюс демо-поля для запитів з ТЗ.
+**Сиди** (`scripts/seed.py`): 2000 відтворюваних полів — 5 демо-полів для запитів з ТЗ і 1995 полів
+у 10 сільгоспкластерах України, різних розмірів (0.5–300 га), культур і власників; ~10% полів перекриваються.
 
 ## Припущення
 
